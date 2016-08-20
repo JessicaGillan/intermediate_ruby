@@ -7,7 +7,7 @@ class TicTacToe
 	def initialize(player_name1, player_name2)
 		@player1 = Player.new(player_name1, "x")
 		@player2 = Player.new(player_name2, "o")
-		@board_spaces = Array.new(9) 
+		@board_spaces = Array.new(9, "_") 
 		@game_over = false
 		@victory = false
 		@current_player = nil
@@ -15,7 +15,7 @@ class TicTacToe
 	end
 
 	def game_over?
-		@victory || @board_spaces.none? { |space| space.nil? }
+		@victory || @board_spaces.none? { |space| space == "_" }
 	end
 
 	def victory?
@@ -28,7 +28,7 @@ class TicTacToe
 	end
 
 	def mark_board(board_space)
-		if board_space.between?(1,9) && @board_spaces[board_space-1] == nil
+		if board_space.between?(1,9) && @board_spaces[board_space-1] == "_"
 			@board_spaces[board_space-1] = current_player.mark
 			update_board(@board_spaces)
 			check_for_victory(@rows, @cols, @diags)
@@ -65,17 +65,19 @@ class TicTacToe
 	end
 
 	def check_for_victory(rows, cols, diags)
-		row_victory = rows.any? { |row| row.uniq.length == 1 && row[0] != nil }
-		col_victory = cols.any? { |col| col.uniq.length == 1 && col[0] != nil }	
-		diag_victory = diags.any? { |diag| diag.uniq.length == 1 && diag[0] != nil }
+		row_victory = rows.any? { |row| row.uniq.length == 1 && row[0] != "_" }
+		col_victory = cols.any? { |col| col.uniq.length == 1 && col[0] != "_" }	
+		diag_victory = diags.any? { |diag| diag.uniq.length == 1 && diag[0] != "_" }
 		
 		@victory = true if (row_victory || col_victory || diag_victory) 
 	end
 
 	def display_board(board_spaces)
-		puts "_#{board_spaces[0]}_|_#{board_spaces[1]}_|_#{board_spaces[2]}_"
-		puts "_#{board_spaces[3]}_|_#{board_spaces[4]}_|_#{board_spaces[5]}_"
-		puts " #{board_spaces[6]} | #{board_spaces[7]} | #{board_spaces[8]} "
+		puts " ___________"
+		for i in (0..2) do
+			puts "|_#{board_spaces[i * 3]}_|_#{board_spaces[i * 3 + 1]}_|_#{board_spaces[i * 3 + 2]}_|"
+		end 
+		puts ""
 	end
 end
 
