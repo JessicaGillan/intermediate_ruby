@@ -81,28 +81,40 @@ class TicTacToe
 	end
 end
 
-print "Enter Player 1's name: "
-name1 = gets.chomp
-print "Enter Player 2's name: "
-name2 = gets.chomp
+loop do 
+	print "Enter Player 1's name: "
+	name1 = gets.chomp
+	print "Enter Player 2's name: "
+	name2 = gets.chomp
 
-puts "Starting Game..."
-game = TicTacToe.new(name1,name2)
+	puts "Starting Game..."
+	game = TicTacToe.new(name1,name2)
 
-until game.game_over?
-	game.start_turn
+	until game.game_over?
+		game.start_turn
 
-	board_space = gets.chomp.strip.to_i
-	valid_choice = game.mark_board(board_space)
-	until valid_choice
-		print "Invalid. Choose another space: "
 		board_space = gets.chomp.strip.to_i
 		valid_choice = game.mark_board(board_space)
+		until valid_choice
+			print "Invalid. Choose another space: "
+			board_space = gets.chomp.strip.to_i
+			valid_choice = game.mark_board(board_space)
+		end
+	end
+
+	if game.victory?
+		puts game.current_player.name + " WON!"
+	else
+		puts "Draw"
+	end
+	print "Play again? (y/n): "
+	continue = gets.chomp
+	case continue
+	when 'y' then puts "Starting a new game..."
+	when 'n' then puts "Quitting program"; exit 
+	else puts "Invalid entry. Quitting program."; exit
 	end
 end
 
-if game.victory?
-	puts game.current_player.name + " WON!"
-else
-	puts "Draw"
-end
+
+
