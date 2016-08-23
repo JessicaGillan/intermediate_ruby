@@ -23,18 +23,15 @@ class Hangman < Game
 		welcome
 	end
 
-	def display_game_status
-		puts
-		puts @guess_progress.join(' ')
-		print "Wrong guesses: #{@wrong_guesses.join(',')}"
-		puts " (#{@strikes_left} strikes left)"
+	def run
+		until game_over? do
+			display_game_status		
+			get_input
+		end
+		puts (victory? ? "\nYou won!!" : "\nGame Over.") + " The secret word was #{@secret_word}"
 	end
 
-	def get_input
-		print "Enter letter guess or 'save' to save game: "
-		user_input = gets.chomp.downcase
-		parse_input(user_input)
-	end
+	private 
 
 	def game_over?
 		return @strikes_left == 0 || victory?
@@ -43,8 +40,6 @@ class Hangman < Game
 	def victory?
 		return @guess_progress.join == @secret_word
 	end
-
-	private 
 
 	def welcome
 		puts "Would you like to start a new game or load a saved game? (new/load) "
@@ -88,6 +83,19 @@ class Hangman < Game
 		words.select { |word| word.length.between?(5,12) }
 	end
 
+	def display_game_status
+		puts
+		puts @guess_progress.join(' ')
+		print "Wrong guesses: #{@wrong_guesses.join(',')}"
+		puts " (#{@strikes_left} strikes left)"
+	end
+
+	def get_input
+		print "Enter letter guess or 'save' to save game: "
+		user_input = gets.chomp.downcase
+		parse_input(user_input)
+	end
+
 	def parse_input(user_input)
 		if user_input == 'save'
 			save_game_and_exit
@@ -119,13 +127,7 @@ puts "\nStarting Hangman"
 
 loop do 
 	game = Hangman.new
-	until game.game_over? do
-		game.display_game_status		
-		game.get_input
-	end
-
-	puts (game.victory? ? "\nYou won!!" : "\nGame Over.") + " The secret word was #{game.secret_word}"
-
+	game.run
 	exit unless Game.play_again?		
 end
 
