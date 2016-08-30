@@ -3,7 +3,8 @@
 # along the way.
 
 class KnightSquare
-	@@range = (0..7)
+	$range = (0..7)
+	$moves = [ [2,1], [2,-1], [-1,2], [1,2], [-2,1], [-2,-1], [1,-2], [-1,-2] ]
 
 	attr_accessor :parent
 	attr_reader :coords
@@ -15,45 +16,27 @@ class KnightSquare
 		@parent = nil
 	end
 
-	def north_right_child
-		@north_right_child ||= create_child(@row+2, @col+1)
-	end
+	def possible_destinations 
+		if @possible_destinations.nil?
+			@possible_destinations = Hash.new { |hash, key| hash[key] = create_child(@row+key[0], @col+key[1]) }
 
-	def north_left_child
-		@north_left_child ||= create_child(@row+2, @col-1)
-	end
+			$moves.each do |move|
+				@possible_destinations[move]
+			end
+		end
 
-	def east_right_child
-		@east_right_child ||= create_child(@row-1, @col+2) 
-	end
-
-	def east_left_child
-		@east_left_child ||= create_child(@row+1, @col+2) 
-	end
-
-	def south_right_child
-		@south_right_child ||= create_child(@row-2, @col-1) 
-	end
-
-	def south_left_child
-		@south_left_child ||= create_child(@row-2, @col+1) 
-	end
-
-	def west_right_child
-		@west_right_child ||= create_child(@row+1, @col-2) 
-	end
-
-	def west_left_child
-		@west_left_child ||= create_child(@row-1, @col-2) 
+		return @possible_destinations
 	end
 
 	private
 
 	def create_child(row, col)
-		if @@range.include?(row) && @@range.include?(col)
+		if $range.include?(row) && $range.include?(col)
+
 			child = KnightSquare.new([row, col])
 			child.parent = self
 			return child
+			
 		else
 			return nil
 		end		
@@ -65,42 +48,53 @@ def breadth_first_search(root, end_square)
 
 	until queue.empty?
  		square = queue.slice!(0)
+
 		return square if square.coords == end_square
-		queue << square.north_right_child unless square.north_right_child.nil?
-		queue << square.north_left_child unless square.north_left_child.nil?
-		queue << square.east_right_child unless square.east_right_child.nil?
-		queue << square.east_left_child unless square.east_left_child.nil?
-		queue << square.south_right_child unless square.south_right_child.nil?
-		queue << square.south_left_child unless square.south_left_child.nil?
-		queue << square.west_right_child unless square.west_right_child.nil?
-		queue << square.west_left_child unless square.west_left_child.nil?
+
+		square.possible_destinations.each do |_,square|
+			queue << square unless square.nil?
+		end
  	end
 
 	return nil
 end
 
-def knight_moves(start_square, end_square)
-	root = KnightSquare.new(start_square) 
- 	square = breadth_first_search(root, end_square)
- 	path = []
- 	count = 0
+def print_path(path, count)
+ 	puts "You made it in #{count} moves!  Here's your path:" 
 
- 	until square == root
- 		path = [square.coords] + path
- 		square = square.parent
- 		count += 1
- 	end
- 	path = [square.coords] + path 
-
- 	puts "You made it in #{count} moves!  Here's your path:"
- 	path.each do |coords|
- 		p coords
- 	end
+ 	until path.empty?
+ 		print path.pop.to_s + " "
+ 	end 	
+ 	puts
 end
 
+def get_path(root, end_square)
+	path = []
+ 	count = 0
+
+ 	until end_square == root
+ 		path.push(end_square.coords)
+ 		end_square = end_square.parent
+ 		count += 1
+ 	end
+ 	path.push(end_square.coords)
+
+ 	print_path(path, count)
+end
+
+def knight_moves(start_coords, end_coords)
+	root = KnightSquare.new(start_coords) 
+ 	end_square = breadth_first_search(root, end_coords)
+ 	get_path(root, end_square)
+end
+
+# testing
 knight_moves([3,3],[4,3])
 # You made it in 3 moves!  Here's your path:
-# [3, 3]
-# [5, 4]
-# [3, 5]
-# [4, 3]
+# [3, 3] [5, 4] [3, 5] [4, 3] 
+
+knight_moves([0,0],[1,2]) # => [0, 0] [1, 2] 
+knight_moves([0,0],[3,3]) #=> [0, 0] [2, 1] [3, 3]
+knight_moves([3,3],[0,0]) # => [3, 3] [1, 2] [0, 0] 
+knight_moves([6,7], [3,5]) # => [6, 7] [4, 6] [2, 7] [3, 5] 
+
