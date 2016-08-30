@@ -126,7 +126,11 @@ class BinaryTree
 	end
 end
 
-tree = BinaryTree.new([1, 7, 4, 23, 8, 9, 45])
-p tree.breadth_first_search(23)
-p tree.depth_first_search(23)
-p tree.dfs_rec(56)
+# tree = BinaryTree.new([1, 7, 4, 23, 8, 9, 45])
+# p tree.breadth_first_search(23)
+# p tree.depth_first_search(23)
+# p tree.dfs_rec(56)
+
+
+
+
